@@ -25,7 +25,6 @@ const InstallPwaFab: React.FC = () => {
     }, []);
 
     if (isDownloaded || isDismissed) return null;
-
     const apkUrl = appSettings?.apkUrl?.trim() || appSettings?.appDownload?.apkUrl?.trim() || '';
     if (!deferredPrompt && !apkUrl) return null;
 
@@ -55,7 +54,7 @@ const InstallPwaFab: React.FC = () => {
     };
 
     return (
-        <div className="fixed bottom-[21rem] right-4 z-[45] flex flex-col items-center gap-1 text-white md:bottom-[19rem] md:right-8">
+        <div className="fixed bottom-[21rem] right-4 z-[45] flex flex-col items-center gap-2 md:bottom-[19rem] md:right-8">
             <button
                 type="button"
                 onClick={handleDownloadApp}
@@ -66,12 +65,12 @@ const InstallPwaFab: React.FC = () => {
                 <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#ff0752] text-white shadow-xl shadow-[#ff0752]/40 transition-transform group-hover:scale-105">
                     <i className="fas fa-download text-3xl" aria-hidden="true" />
                 </span>
-                <span className="text-sm font-bold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">App Download</span>
+                <span className="text-sm font-bold tracking-wide text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">App Download</span>
             </button>
             <button
                 type="button"
                 onClick={() => setIsDismissed(true)}
-                className="absolute -right-2 top-0 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-xs text-white opacity-0 transition-opacity hover:opacity-100 focus:opacity-100"
+                className="absolute -right-2 top-0 flex h-6 w-6 items-center justify-center rounded-full bg-black/70 text-xs text-white opacity-0 transition-opacity hover:opacity-100 focus:opacity-100"
                 title="Dismiss app download"
                 aria-label="Dismiss app download"
             >

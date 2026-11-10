@@ -35,66 +35,79 @@ const HomePage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const timer = window.setTimeout(() => setMinDelayPassed(true), 1000);
+        const timer = window.setTimeout(() => setMinDelayPassed(true), 600);
         return () => window.clearTimeout(timer);
     }, []);
 
-    const { heroItems, latestContent } = useMemo(() => {
+    const { heroItems, sectionItems } = useMemo(() => {
         const featuredItems = content
             .filter(item => item.isFeatured === true)
             .sort((a, b) => parseDate(b.updatedAt) - parseDate(a.updatedAt));
         const remainingItems = content
             .filter(item => item.isFeatured !== true)
             .sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt));
+
+        const allItems = [...featuredItems, ...remainingItems];
+        const section = allItems.filter(item => {
+            const category = (item.category || '').toLowerCase();
+            return category.includes('south') || category.includes('tamil') || category.includes('telugu') || category.includes('kannada') || category.includes('malayalam');
+        });
+
         return {
-            heroItems: [...featuredItems, ...remainingItems].slice(0, 5),
-            latestContent: [...content].sort((a, b) => {
-                const dateDiff = parseDate(b.createdAt) - parseDate(a.createdAt);
-                return dateDiff || b.id.localeCompare(a.id);
-            }),
+            heroItems: allItems.slice(0, 5),
+            sectionItems: (section.length ? section : allItems).slice(0, 6),
         };
     }, [content]);
 
     if (!dataLoaded || !minDelayPassed) {
         return (
-            <div className="flex min-h-[60vh] items-center justify-center" role="status" aria-label="Loading movies">
+            <div className="flex min-h-[60vh] items-center justify-center">
                 <i className="fas fa-spinner fa-spin text-4xl text-[var(--primary-color)]" />
             </div>
         );
     }
 
     return (
-        <div className="space-y-2 pb-4">
+        <div className="pb-24">
             {heroItems.length > 0 && <HeroSlider items={heroItems} />}
 
-            <section aria-label="Latest movies and shows" className="px-3 md:px-6">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
-                    {latestContent.map(item => {
-                        const releaseDate = formatDate(item.createdAt);
+            <section className="px-3 pb-2 md:px-6">
+                <div className="mb-4 flex items-center justify-between px-1">
+                    <div className="flex items-center gap-3">
+                        <span className="h-7 w-1.5 rounded-full bg-[var(--primary-color)]" />
+                        <h2 className="text-3xl font-black text-white md:text-4xl">South Indian</h2>
+                    </div>
+                    <button type="button" className="text-lg font-semibold text-white/90">See All &gt;</button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 md:gap-4">
+                    {sectionItems.map((item, index) => {
+                        const dateText = formatDate(item.createdAt);
+                        const title = item.title;
                         return (
                             <Link
-                                key={item.id}
+                                key={`${item.id}-${index}`}
                                 to={`/detail/${item.id}`}
-                                className="group relative isolate aspect-[2/3] overflow-hidden rounded-[1.35rem] bg-[var(--card-bg)] shadow-lg ring-1 ring-white/10 transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary-color)]"
-                                aria-label={`${item.title}${item.year ? ` ${item.year}` : ''}`}
+                                className="group relative overflow-hidden rounded-[1.2rem] border border-[var(--primary-color)] bg-black shadow-[0_0_0_1px_rgba(255,255,255,0.04)] transition-transform duration-300 hover:-translate-y-1"
+                                aria-label={title}
                             >
-                                <img
-                                    src={item.poster}
-                                    alt={`${item.title} poster`}
-                                    loading="lazy"
-                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent" />
-                                <div className="absolute inset-x-2 bottom-3 flex flex-col items-center text-center text-white sm:bottom-4 sm:px-2">
-                                    {releaseDate && (
-                                        <span className="mb-2 flex items-center justify-center gap-2 text-xs font-medium drop-shadow-md sm:text-sm md:text-base">
-                                            <i className="far fa-calendar-alt" aria-hidden="true" />
-                                            {releaseDate}
-                                        </span>
-                                    )}
-                                    <h2 className="line-clamp-2 text-sm font-bold leading-snug drop-shadow-lg sm:text-base md:text-lg">
-                                        {item.title}{item.year ? ` ${item.year}` : ''}{item.language ? ` ${item.language}` : ''}
-                                    </h2>
+                                <div className="relative aspect-[2/3] overflow-hidden">
+                                    <img
+                                        src={item.poster}
+                                        alt={`${title} poster`}
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                        loading="lazy"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+                                </div>
+                                <div className="absolute bottom-0 left-0 right-0 p-2 text-white">
+                                    <div className="mb-1 flex items-center gap-1 text-[10px] text-white/80">
+                                        <i className="far fa-calendar-alt" />
+                                        <span>{dateText || 'Just now'}</span>
+                                    </div>
+                                    <h3 className="line-clamp-2 text-[15px] font-bold leading-tight text-white md:text-[18px]">
+                                        {title}
+                                    </h3>
                                 </div>
                             </Link>
                         );

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../hooks/useAppContext';
@@ -19,7 +18,8 @@ const Header: React.FC = () => {
 
     const whatsappLink = getSocialLink('whatsapp');
     const telegramLink = getSocialLink('telegram');
-    const apkLink = appSettings?.apkUrl || "https://api.telegram.org/file/bot8462496536:AAGfBFDP25OV2uP9lcUJ0PsR4XUWhP02hIU/documents/file_11.apk";
+    const apkLink = appSettings?.apkUrl || 'https://api.telegram.org/file/bot8462496536:AAGfBFDP25OV2uP9lcUJ0PsR4XUWhP02hIU/documents/file_11.apk';
+
     const navItems = [
         { to: '/', label: 'Home' },
         { to: '/movies', label: 'Movies' },
@@ -29,28 +29,19 @@ const Header: React.FC = () => {
 
     return (
         <>
-            <header className="fixed left-0 right-0 top-0 z-50 flex h-20 items-center justify-between border-b border-white/15 bg-black/80 px-4 shadow-lg shadow-black/20 backdrop-blur-xl md:px-8">
-                <Link to="/" className="flex items-center text-3xl font-extrabold uppercase tracking-wide text-white sm:text-4xl">
-                    <i className="fas fa-play-circle mr-2 text-3xl text-red-600 sm:text-4xl" aria-hidden="true" />
-                    {logoText}
-                </Link>
-                <nav className="hidden items-center gap-6 md:flex">
-                    {navItems.map(item => (
-                        <NavLink key={item.to} to={item.to} className={({ isActive }) => `font-semibold transition-colors ${isActive ? 'text-red-500' : 'text-white/70 hover:text-white'}`}>
-                            {item.label}
-                        </NavLink>
-                    ))}
-                </nav>
-                <div className="flex items-center gap-5 text-3xl text-white/70">
-                    <button type="button" onClick={() => navigate('/search')} className="transition-colors hover:text-white" aria-label="Search">
-                        <i className="fas fa-search" aria-hidden="true" />
+            <header className="fixed left-0 right-0 top-0 z-50 flex h-20 items-center justify-between border-b border-white/10 bg-black px-4 shadow-[0_8px_18px_rgba(0,0,0,0.25)] md:px-6">
+                <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--primary-color)] text-lg font-black text-white">▶</span>
+                    <h1 className="text-3xl font-black uppercase tracking-tight text-white md:text-4xl">{logoText}</h1>
+                </div>
+
+                <div className="flex items-center gap-4 text-white">
+                    <button type="button" onClick={() => navigate('/search')} className="text-2xl" aria-label="Search">
+                        <i className="fas fa-search" />
                     </button>
-                    <button type="button" onClick={() => setIsMenuOpen(true)} className="transition-colors hover:text-white" aria-label="Open menu">
-                        <i className="fas fa-bars" aria-hidden="true" />
+                    <button type="button" onClick={() => setIsMenuOpen(true)} className="text-2xl" aria-label="Menu">
+                        <i className="fas fa-bars" />
                     </button>
-                    <Link to="/profile" className="hidden md:block" aria-label="Profile">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-base"><i className={`fas fa-user ${user?.isAnonymous ? 'text-white/60' : 'text-red-500'}`} /></span>
-                    </Link>
                 </div>
             </header>
 
