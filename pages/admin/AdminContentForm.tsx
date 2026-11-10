@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Content, QualityLink, Season, CastMember } from '../../types';
 import { getContentById, addContent, updateContent } from '../../services/firebaseService';
 import { formatStreamUrl, DEFAULT_STREAM_SERVER } from '../../utils/stream';
+import { useAppContext } from '../../hooks/useAppContext';
 
 const AdminContentForm: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { appSettings } = useAppContext();
     
     // Initialize with safe defaults to prevent "undefined" errors
     const [content, setContent] = useState<Partial<Content>>({
@@ -214,6 +216,46 @@ const AdminContentForm: React.FC = () => {
             };
             return { ...prev, seasons: newSeasons };
         });
+    };
+
+    const handleShortenLink = (index: number) => {
+        const rawList = content.qualityLinks;
+        const currentList = Array.isArray(rawList) ? rawList : (rawList ? Object.values(rawList) : []);
+        const rawUrl = currentList[index]?.url?.trim();
+        if (!rawUrl) {
+            alert("Please enter a Download URL first!");
+            return;
+        }
+        const shortener = appSettings?.urlShortener;
+        if (shortener?.enabled && shortener.apiTemplate) {
+            let template = shortener.apiTemplate;
+            template = template.replace('{API_KEY}', encodeURIComponent(shortener.apiKey || '')).replace('{URL}', encodeURIComponent(rawUrl));
+            handleNestedChange(index, 'url', template, 'qualityLinks');
+            alert("Download Link formatted with URL Shortener!");
+        } else {
+            alert("To auto-shorten, configure your Shortener API in Admin -> Settings -> Download Button & URL Shortener.");
+        }
+    };
+
+    const handleShortenSeasonLink = (seasonIndex: number, linkIndex: number) => {
+        const rawSeasons = content.seasons;
+        const currentSeasons = Array.isArray(rawSeasons) ? rawSeasons : (rawSeasons ? Object.values(rawSeasons) : []);
+        const rawLinks = currentSeasons[seasonIndex]?.qualityLinks;
+        const targetLinks = Array.isArray(rawLinks) ? rawLinks : (rawLinks ? Object.values(rawLinks) : []);
+        const rawUrl = targetLinks[linkIndex]?.url?.trim();
+        if (!rawUrl) {
+            alert("Please enter a Download URL first!");
+            return;
+        }
+        const shortener = appSettings?.urlShortener;
+        if (shortener?.enabled && shortener.apiTemplate) {
+            let template = shortener.apiTemplate;
+            template = template.replace('{API_KEY}', encodeURIComponent(shortener.apiKey || '')).replace('{URL}', encodeURIComponent(rawUrl));
+            handleSeasonLinkChange(seasonIndex, linkIndex, 'url', template, 'qualityLinks');
+            alert("Download Link formatted with URL Shortener!");
+        } else {
+            alert("To auto-shorten, configure your Shortener API in Admin -> Settings -> Download Button & URL Shortener.");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -441,12 +483,20 @@ const AdminContentForm: React.FC = () => {
                     </div>
 
                     <div className="bg-[var(--card-bg)] p-6 rounded-lg border border-green-500/30">
-                        <h2 className="text-xl font-bold mb-4 text-green-400">Download Links</h2>
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <h2 className="text-xl font-bold text-green-400">Download Links</h2>
+                            <span className="text-xs text-green-300/80 bg-green-500/10 px-2.5 py-1 rounded-full border border-green-500/20">
+                                Direct & URL Shortener links supported (GPLinks, ShrinkMe, Droplink, etc.)
+                            </span>
+                        </div>
                         {qLinks.map((link, index) => (
-                            <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2 items-center">
-                                <input value={link.quality} onChange={(e) => handleNestedChange(index, 'quality', e.target.value, 'qualityLinks')} placeholder="Quality" className="p-2 bg-[var(--bg-color)] border border-[var(--border-color)] rounded"/>
-                                <input value={link.url} onChange={(e) => handleNestedChange(index, 'url', e.target.value, 'qualityLinks')} placeholder="Download URL" className="p-2 bg-[var(--bg-color)] border border-[var(--border-color)] rounded font-mono text-sm"/>
-                                <button type="button" onClick={() => removeListItem(index, 'qualityLinks')} className="text-red-500 hover:underline text-sm">Remove</button>
+                            <div key={index} className="grid grid-cols-1 md:grid-cols-[130px_1fr_auto_auto] gap-2 mb-2 items-center">
+                                <input value={link.quality} onChange={(e) => handleNestedChange(index, 'quality', e.target.value, 'qualityLinks')} placeholder="Quality" className="p-2 bg-[var(--bg-color)] border border-[var(--border-color)] rounded text-sm"/>
+                                <input value={link.url} onChange={(e) => handleNestedChange(index, 'url', e.target.value, 'qualityLinks')} placeholder="Download URL or Shortener Link" className="p-2 bg-[var(--bg-color)] border border-[var(--border-color)] rounded font-mono text-sm"/>
+                                <button type="button" onClick={() => handleShortenLink(index)} className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30 px-2.5 py-1.5 rounded text-xs font-bold" title="Convert with URL Shortener API">
+                                    ⚡ Shorten
+                                </button>
+                                <button type="button" onClick={() => removeListItem(index, 'qualityLinks')} className="text-red-500 hover:underline text-sm px-1">Remove</button>
                             </div>
                         ))}
                         <button type="button" onClick={() => addListItem('qualityLinks')} className="text-green-500 font-semibold mt-2">+ Add Download Link</button>
@@ -491,12 +541,18 @@ const AdminContentForm: React.FC = () => {
                                 </div>
 
                                 <div className="pl-4 border-l-2 border-green-500/30">
-                                    <h3 className="font-semibold mb-2 text-sm text-green-400">Download Links</h3>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="font-semibold text-sm text-green-400">Download Links</h3>
+                                        <span className="text-[11px] text-green-300/80">Direct or Shortened URLs</span>
+                                    </div>
                                     {sDLinks.map((link, lIdx) => (
-                                        <div key={lIdx} className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2 items-center">
+                                        <div key={lIdx} className="grid grid-cols-1 md:grid-cols-[110px_1fr_auto_auto] gap-2 mb-2 items-center">
                                             <input value={link.quality} onChange={(e) => handleSeasonLinkChange(sIdx, lIdx, 'quality', e.target.value, 'qualityLinks')} placeholder="Quality" className="p-2 text-xs bg-[var(--bg-color)] border border-[var(--border-color)] rounded"/>
-                                            <input value={link.url} onChange={(e) => handleSeasonLinkChange(sIdx, lIdx, 'url', e.target.value, 'qualityLinks')} placeholder="URL" className="p-2 text-xs bg-[var(--bg-color)] border border-[var(--border-color)] rounded font-mono"/>
-                                            <button type="button" onClick={() => removeSeasonLink(sIdx, lIdx, 'qualityLinks')} className="text-red-500 text-xs">Remove</button>
+                                            <input value={link.url} onChange={(e) => handleSeasonLinkChange(sIdx, lIdx, 'url', e.target.value, 'qualityLinks')} placeholder="Download URL / Shortener Link" className="p-2 text-xs bg-[var(--bg-color)] border border-[var(--border-color)] rounded font-mono"/>
+                                            <button type="button" onClick={() => handleShortenSeasonLink(sIdx, lIdx)} className="bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 border border-amber-500/30 px-2 py-1 rounded text-[11px] font-bold" title="Convert with URL Shortener">
+                                                ⚡ Shorten
+                                            </button>
+                                            <button type="button" onClick={() => removeSeasonLink(sIdx, lIdx, 'qualityLinks')} className="text-red-500 text-xs px-1">Remove</button>
                                         </div>
                                     ))}
                                     <button type="button" onClick={() => addSeasonLink(sIdx, 'qualityLinks')} className="text-green-500 text-sm mt-2">+ Add Download</button>

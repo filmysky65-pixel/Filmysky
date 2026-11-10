@@ -6,6 +6,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import AdContainer from '../components/AdContainer';
 import SeoMeta from '../components/SeoMeta';
 import { buildMovieDescription, buildMovieTitle, buildPosterAlt } from '../utils/seo';
+import { executeDownloadWithAd } from '../utils/downloadAdHelper';
 
 const DownloadPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -93,7 +94,7 @@ const DownloadPage: React.FC = () => {
                 <main className="flex-1 px-4 py-6 md:px-10 md:py-10">
                     <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[260px_1fr] gap-6">
                         <div className="flex flex-col items-center md:items-start">
-                            <img src={content.poster} alt={buildPosterAlt(content.title)} className="w-44 md:w-56 rounded-2xl shadow-2xl border-4 border-[var(--primary-color)]/70" />
+                            <img src={content.poster} alt={buildPosterAlt(content.title)} className="w-44 md:w-56 rounded-2xl shadow-2xl border-t-4 border-b-4 border-[var(--primary-color)]" />
                             <div className="mt-4 text-center md:text-left">
                                 <h1 className="text-2xl md:text-4xl font-bold text-white">{content.title}</h1>
                                 <p className="text-sm text-gray-300 mt-2">{content.year} • {content.language} • {content.type}</p>
@@ -122,7 +123,7 @@ const DownloadPage: React.FC = () => {
                                 {downloadLinks.length > 0 ? downloadLinks.map((link, index) => (
                                     <button
                                         key={`${link.quality}-${index}`}
-                                        onClick={() => window.open(link.url, '_blank')}
+                                        onClick={() => executeDownloadWithAd(link.url, appSettings, permissions.shouldShowAds)}
                                         className="w-full flex items-center justify-between px-5 py-4 rounded-xl bg-[var(--bg-color)] border border-[var(--border-color)] hover:border-[var(--primary-color)] transition-colors group"
                                     >
                                         <div className="flex items-center gap-3 text-left">

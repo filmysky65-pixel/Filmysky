@@ -18,6 +18,7 @@ import ThemeModal from './components/ThemeModal';
 import AboutMeModal from './components/AboutMeModal';
 import InstallPwaFab from './components/InstallPwaFab';
 import WhatsAppFab from './components/WhatsAppFab';
+import TelegramFab from './components/TelegramFab';
 
 import HomePage from './pages/HomePage';
 
@@ -149,10 +150,11 @@ const AppContent: React.FC = () => {
         </Routes>
       </main>
 
-      {!hideNav && !isYouTube && <BannerAd />}
+      {!hideNav && !isYouTube && location.pathname !== '/' && <BannerAd />}
       {!hideNav && !isYouTube && <Footer />}
       {!hideNav && !isYouTube && <BottomNav />}
       {!hideNav && !isYouTube && <WhatsAppFab />}
+      {!hideNav && !isYouTube && <TelegramFab />}
       {isYouTube && <YouTubeFooter />}
       
       <InstallPwaFab />
