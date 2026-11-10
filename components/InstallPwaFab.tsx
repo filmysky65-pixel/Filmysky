@@ -5,55 +5,34 @@ import { useAppContext } from '../hooks/useAppContext';
 const InstallPwaFab: React.FC = () => {
     const { deferredPrompt, triggerInstallPrompt, appSettings } = useAppContext();
     const location = useLocation();
-    
-    // Check if the app has already been downloaded or installed
     const [isDownloaded, setIsDownloaded] = useState<boolean>(() => {
         try {
-            return (
-                localStorage.getItem('filmysky_app_downloaded') === 'true' ||
-                (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches)
-            );
+            return localStorage.getItem('filmysky_app_downloaded') === 'true' ||
+                (typeof window !== 'undefined' && window.matchMedia('(display-mode: standalone)').matches);
         } catch {
             return false;
         }
     });
-
     const [isDismissed, setIsDismissed] = useState(false);
 
     useEffect(() => {
-        // Listen for app installed event to auto-remove
         const handleAppInstalled = () => {
-            try {
-                localStorage.setItem('filmysky_app_downloaded', 'true');
-            } catch {}
+            try { localStorage.setItem('filmysky_app_downloaded', 'true'); } catch {}
             setIsDownloaded(true);
         };
-
         window.addEventListener('appinstalled', handleAppInstalled);
         return () => window.removeEventListener('appinstalled', handleAppInstalled);
     }, []);
 
-    // If already downloaded or dismissed, remove floating widget completely
-    if (isDownloaded || isDismissed) {
-        return null;
-    }
+    if (isDownloaded || isDismissed) return null;
 
     const apkUrl = appSettings?.apkUrl?.trim() || appSettings?.appDownload?.apkUrl?.trim() || '';
-    const hasDownloadOption = Boolean(deferredPrompt || apkUrl);
+    if (!deferredPrompt && !apkUrl) return null;
 
-    if (!hasDownloadOption) {
-        return null;
-    }
-
-    // Hide on specific pages if needed
     const path = location.pathname;
-    const isHidden = 
-        path.startsWith('/player/') || 
-        (path.startsWith('/livetv/') && path.split('/').length > 3) || 
-        path === '/ad' || 
-        path === '/auth' || 
-        path.startsWith('/admin');
-
+    const isHidden = path.startsWith('/player/') ||
+        (path.startsWith('/livetv/') && path.split('/').length > 3) ||
+        path === '/ad' || path === '/auth' || path.startsWith('/admin');
     if (isHidden) return null;
 
     const handleDownloadApp = async () => {
@@ -61,7 +40,6 @@ const InstallPwaFab: React.FC = () => {
             if (deferredPrompt) {
                 await triggerInstallPrompt();
             } else if (apkUrl) {
-                // Download the APK
                 const link = document.createElement('a');
                 link.href = apkUrl;
                 link.download = 'FilmySky.apk';
@@ -71,53 +49,35 @@ const InstallPwaFab: React.FC = () => {
                 link.click();
                 document.body.removeChild(link);
             }
-
-            // Immediately mark as downloaded and remove from screen
-            localStorage.setItem('filmysky_app_downloaded', 'true');
-            setIsDownloaded(true);
-        } catch (err) {
-            console.error('App download error:', err);
-            // Even if error, mark downloaded to satisfy user request
-            localStorage.setItem('filmysky_app_downloaded', 'true');
-            setIsDownloaded(true);
+        } catch (error) {
+            console.error('App download error:', error);
         }
     };
 
     return (
-        <aside 
-            className="fixed bottom-20 left-3 md:bottom-8 md:left-8 z-50 flex items-center bg-gradient-to-r from-[#11111d] to-[#1e1b4b] border border-white/15 text-white pl-3.5 pr-2 py-2 rounded-2xl shadow-2xl shadow-indigo-950/60 backdrop-blur-xl animate-fade-in group"
-            aria-label="Download App"
-        >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 mr-3 flex-shrink-0">
-                <i className="fas fa-mobile-alt text-lg text-white"></i>
-            </div>
-            
-            <div className="mr-3 text-left">
-                <div className="text-xs font-bold leading-tight flex items-center gap-1.5">
-                    <span>Download App</span>
-                    <span className="bg-emerald-500/20 text-emerald-400 text-[9px] px-1.5 py-0.2 rounded font-extrabold uppercase">FREE</span>
-                </div>
-                <div className="text-[10px] text-gray-300">Fast & smooth streaming</div>
-            </div>
-
-            <button 
+        <div className="fixed bottom-[21rem] right-4 z-[45] flex flex-col items-center gap-1 text-white md:bottom-[19rem] md:right-8">
+            <button
+                type="button"
                 onClick={handleDownloadApp}
-                className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-xs px-3 py-2 rounded-xl shadow-md transition-all duration-200 active:scale-95 flex items-center gap-1.5 flex-shrink-0"
-                title="Download and install app"
+                className="group flex flex-col items-center gap-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-500"
+                title="Download and install FilmySky"
+                aria-label="Download and install FilmySky"
             >
-                <i className="fas fa-download text-[11px]"></i>
-                <span>Get App</span>
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#ff0752] text-white shadow-xl shadow-[#ff0752]/40 transition-transform group-hover:scale-105">
+                    <i className="fas fa-download text-3xl" aria-hidden="true" />
+                </span>
+                <span className="text-sm font-bold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">App Download</span>
             </button>
-
-            <button 
-                onClick={() => setIsDismissed(true)} 
-                className="ml-2 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors text-xs"
-                title="Dismiss"
-                aria-label="Close"
+            <button
+                type="button"
+                onClick={() => setIsDismissed(true)}
+                className="absolute -right-2 top-0 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-xs text-white opacity-0 transition-opacity hover:opacity-100 focus:opacity-100"
+                title="Dismiss app download"
+                aria-label="Dismiss app download"
             >
-                ✕
+                ×
             </button>
-        </aside>
+        </div>
     );
 };
 

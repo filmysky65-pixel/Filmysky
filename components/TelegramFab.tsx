@@ -33,11 +33,11 @@ const TelegramFab: React.FC = () => {
             href={telegramLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="group fixed bottom-[10.5rem] right-4 z-[60] flex flex-col items-center gap-1 text-white transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#229ED9] md:bottom-28 md:right-8"
+            className="group fixed bottom-[14.5rem] right-4 z-[45] flex flex-col items-center gap-1 text-white transition-transform duration-300 hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#229ED9] md:bottom-28 md:right-8"
             title="Join us on Telegram"
             aria-label="Join us on Telegram"
         >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#229ED9] text-white shadow-xl shadow-[#229ED9]/40 transition-colors group-hover:bg-[#1c8ec4] group-hover:shadow-[#229ED9]/60">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#08a9e8] text-white shadow-xl shadow-[#08a9e8]/40 transition-colors group-hover:bg-[#078fc6]">
                 <i className="fab fa-telegram-plane text-3xl" aria-hidden="true" />
             </span>
             <span className="text-sm font-bold tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">Telegram</span>

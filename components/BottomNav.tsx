@@ -10,37 +10,20 @@ const navItems = [
     { to: '/profile', icon: 'fas fa-user', label: 'Profile' },
 ];
 
-const BottomNav: React.FC = () => {
-    return (
-        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-lg h-16 bg-[var(--card-bg)]/80 backdrop-blur-lg border border-[var(--border-color)] rounded-full shadow-2xl flex justify-around items-center z-50 md:hidden px-2">
-            {navItems.map((item) => (
-                <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) => 
-                        `flex flex-col items-center justify-center transition-all duration-300 relative ${
-                            isActive ? 'text-[var(--primary-color)]' : 'text-gray-400'
-                        }`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <div className={`flex items-center justify-center w-12 h-8 rounded-full transition-all duration-300 ${
-                                isActive ? 'bg-[var(--primary-color)]/20' : ''
-                            }`}>
-                                <i className={`${item.icon} text-lg`}></i>
-                            </div>
-                            <span className={`text-[10px] mt-0.5 font-semibold transition-all duration-300 ${
-                                isActive ? 'opacity-100' : 'opacity-70'
-                            }`}>
-                                {item.label}
-                            </span>
-                        </>
-                    )}
-                </NavLink>
-            ))}
-        </nav>
-    );
-};
+const BottomNav: React.FC = () => (
+    <nav className="fixed bottom-4 left-1/2 z-50 flex h-[5.25rem] w-[94%] max-w-5xl -translate-x-1/2 items-center justify-around rounded-full border border-white/30 bg-[linear-gradient(110deg,rgba(194,157,101,0.78),rgba(92,75,72,0.84))] px-2 shadow-[0_12px_35px_rgba(0,0,0,0.5)] backdrop-blur-xl md:bottom-6 md:h-20 md:max-w-3xl md:px-5">
+        {navItems.map(item => (
+            <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) => `flex min-w-0 flex-1 flex-col items-center justify-center gap-1 transition-colors ${isActive ? 'text-red-600' : 'text-white/60 hover:text-white'}`}
+            >
+                <i className={`${item.icon} text-xl sm:text-2xl md:text-3xl`} aria-hidden="true" />
+                <span className="text-[10px] font-bold sm:text-xs md:text-sm">{item.label}</span>
+            </NavLink>
+        ))}
+    </nav>
+);
 
 export default BottomNav;
