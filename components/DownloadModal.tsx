@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { QualityLink } from '../types';
+import { useAppContext } from '../hooks/useAppContext';
+import { executeDownloadWithAd } from '../utils/downloadAdHelper';
 
 interface DownloadModalProps {
   isOpen: boolean;
@@ -11,11 +13,15 @@ interface DownloadModalProps {
 }
 
 const DownloadModal: React.FC<DownloadModalProps> = ({ isOpen, onClose, links, title, actionType = 'download' }) => {
+  const { appSettings, permissions } = useAppContext();
   if (!isOpen) return null;
 
   const handleAction = (url: string, quality: string) => {
-    // Open in new tab - most reliable for both streams and downloads across devices
-    window.open(url, '_blank');
+    if (actionType === 'download') {
+      executeDownloadWithAd(url, appSettings, permissions.shouldShowAds);
+    } else {
+      window.open(url, '_blank');
+    }
     onClose();
   };
 

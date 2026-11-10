@@ -157,7 +157,7 @@ const DetailPage: React.FC = () => {
             
             <div className="p-4 md:p-6 -mt-24 md:-mt-32 relative md:max-w-5xl md:mx-auto">
                 <div className="md:flex md:gap-6 items-end">
-                    <img src={content.poster} alt={buildPosterAlt(content.title)} className="w-32 md:w-48 rounded-lg shadow-lg aspect-[2/3] flex-shrink-0 border-4 border-[var(--primary-color)]"/>
+                    <img src={content.poster} alt={buildPosterAlt(content.title)} className="w-32 md:w-48 rounded-lg shadow-2xl aspect-[2/3] flex-shrink-0 border-t-4 border-b-4 border-[var(--primary-color)]"/>
                     <div className="mt-4 md:mt-0">
                         <h1 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg">{content.title}</h1>
                         <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-sm text-gray-300 mt-2">

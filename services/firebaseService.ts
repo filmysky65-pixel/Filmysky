@@ -415,7 +415,7 @@ export const getUserWallet = async (userId: string): Promise<{ balance: number, 
     return { balance, transactions };
 };
 
-export const submitPaymentRequest = async (requestData: Omit<PaymentRequest, 'id' | 'requestedAt' | 'status'>): Promise<void> => {
+export const submitPaymentRequest = async (requestData: Omit<PaymentRequest, 'id' | 'requestedAt' | 'status'>): Promise<string> => {
     const sanitizedData = JSON.parse(JSON.stringify(requestData));
     const newRequestRef = db.ref('filmysky/paymentRequests').push();
     await newRequestRef.set({
@@ -423,6 +423,18 @@ export const submitPaymentRequest = async (requestData: Omit<PaymentRequest, 'id
         status: 'pending',
         requestedAt: firebase.database.ServerValue.TIMESTAMP,
     });
+    return newRequestRef.key || '';
+};
+
+export const autoVerifyPaymentRequest = async (requestId: string): Promise<{ success: boolean; message: string }> => {
+    const result = await updatePaymentRequestStatus(requestId, 'approved');
+    if (result.success) {
+        // Tag as autoVerified
+        try {
+            await db.ref(`filmysky/paymentRequests/${requestId}`).update({ autoVerified: true });
+        } catch {}
+    }
+    return result;
 };
 
 export const getPaymentRequests = (callback: (requests: PaymentRequest[]) => void) => {

@@ -1,40 +1,22 @@
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
+import { useAppContext } from '../hooks/useAppContext';
 
 const TelegramFab: React.FC = () => {
     const location = useLocation();
-    const [telegramLink, setTelegramLink] = useState<string | null>(null);
+    const { appSettings } = useAppContext();
 
-    // Direct listener to Firebase to ensure we find the link no matter what
-    useEffect(() => {
-        const db = firebase.database();
-        const settingsRef = db.ref('filmysky/appSettings');
+    // Only get the link from admin settings - NO hardcoded fallback
+    const rawLink = 
+        appSettings?.socials?.telegram || 
+        appSettings?.socials?.Telegram || 
+        (appSettings as any)?.telegram || 
+        (appSettings as any)?.Telegram ||
+        '';
 
-        const listener = settingsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (!data) {
-                setTelegramLink(null);
-                return;
-            }
+    const telegramLink = rawLink.trim();
 
-            // Aggressively search for the link in known paths
-            const link = 
-                data.socials?.telegram || 
-                data.socials?.Telegram || 
-                data.telegram || 
-                data.Telegram ||
-                null;
-
-            setTelegramLink(link);
-        });
-
-        return () => settingsRef.off('value', listener);
-    }, []);
-
-    // If no link is found in the DB, do not render
+    // If no link is configured by admin, do NOT show the floating button
     if (!telegramLink) return null;
 
     const path = location.pathname;
@@ -54,10 +36,16 @@ const TelegramFab: React.FC = () => {
             href={telegramLink} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="fixed bottom-32 right-4 md:bottom-8 md:right-8 z-[9999] w-14 h-14 bg-[#229ED9] hover:bg-[#1f8ubc] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#229ED9]/40 transition-all duration-300 hover:scale-110 hover:-rotate-12 group"
+            className="fixed bottom-[10.5rem] right-4 md:bottom-28 md:right-8 z-50 flex flex-col items-center justify-center group select-none transition-transform duration-300 hover:scale-105"
             title="Join us on Telegram"
+            aria-label="Join us on Telegram"
         >
-            <i className="fab fa-telegram-plane text-3xl group-hover:animate-pulse"></i>
+            <div className="w-13 h-13 md:w-14 md:h-14 bg-[#229ED9] hover:bg-[#1c8ec4] text-white rounded-full flex items-center justify-center shadow-lg shadow-[#229ED9]/40 transition-all duration-300 group-hover:shadow-[#229ED9]/60">
+                <i className="fab fa-telegram-plane text-2xl md:text-3xl"></i>
+            </div>
+            <span className="mt-0.5 text-[11px] font-semibold text-white tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
+                Telegram
+            </span>
         </a>
     );
 };

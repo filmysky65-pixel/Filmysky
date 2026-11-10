@@ -134,6 +134,10 @@ export interface PaymentRequest {
   userTransactionId?: string; // User-provided transaction ID (optional)
   status: 'pending' | 'approved' | 'rejected';
   requestedAt: number;
+  gateway?: 'upi' | 'paypal' | 'card' | 'crypto';
+  currency?: string;
+  country?: string;
+  autoVerified?: boolean;
 }
 
 // Fix: Defined AdCampaign interface.
@@ -226,6 +230,36 @@ export interface AppSettings {
     website?: string;
   };
   youtube?: YouTubeConfig;
+  posterBorderColor?: string;
+  appDownload?: {
+    enabled?: boolean;
+    apkUrl?: string;
+    appName?: string;
+    buttonText?: string;
+  };
+  urlShortener?: {
+    enabled?: boolean;
+    providerName?: string;
+    apiKey?: string;
+    apiTemplate?: string;
+    autoShorten?: boolean;
+  };
+  downloadAd?: {
+    enabled?: boolean;
+    adUrl?: string;
+    adType?: 'direct_link' | 'countdown';
+    timerSeconds?: number;
+  };
+  paymentConfig?: {
+    autoVerifyEnabled?: boolean;
+    enableInternational?: boolean;
+    paypalEmail?: string;
+    stripePublishableKey?: string;
+    cryptoUsdtAddress?: string;
+    cryptoNetwork?: string;
+    merchantName?: string;
+    exchangeRateUsdToInr?: number;
+  };
 }
 
 // Fix: Defined ContactMessage interface.
