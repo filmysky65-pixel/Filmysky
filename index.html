@@ -4,16 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vegamovies</title>
-  <meta name="google-site-verification" content="v5aha08Ynz_BzNitwC_uK_dBPqXg-3PL6KRwm2s39h4" />
-  <meta name="description" content="Vegamovies - The best place to download and watch the latest movies and web series. Official Vegamovies website for high-quality entertainment.">
-  <meta name="keywords" content="Vegamovies, vegamovies official, download movies, latest web series, bollywood movies, hollywood movies, vegamovies app">
+  <meta name="description" content="Watch and download the latest South Indian movies, Bollywood hits, and OTT web series on Filmysky.">
+  <title>FilmySky</title>
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjy34SzFABKNaF50DvBLeFHbjCjRqKfBLD0fmolpFBNbYQhdw7DBtadjYpkGheVCObdpH9eqvKlSOVR3usOvgRv_sTLUGs2XeCYf9dBch0Thf_gEOD4BCIHJw5yxoRv_HT_zSic9icIukLddZ2Qktx54sFh7g0o6FjIyflj5KXzlH6ssXOhgptqTP27-v0/s1600/download-removebg-preview.png">
-  
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
   
   <style>
     /* Global Font Reset - Force Poppins everywhere */
@@ -69,7 +67,7 @@
         scrollbar-width: none;  /* Firefox */
     }
 
-    [data-theme='Vegamovies-dark'] {
+    [data-theme='FilmySky-dark'] {
         --bg-color: #10141f;
         --card-bg: #161d2f;
         --text-color: #ffffff;
@@ -109,7 +107,10 @@
     }
   </style>
 
-<link rel="stylesheet" href="/index.css">
+</head>
+<body data-theme="classic-dark">
+  <div id="root"></div>
+
   <script type="importmap">
   {
     "imports": {
@@ -121,22 +122,28 @@
     }
   }
   </script>
-  <script type="module" crossorigin src="/assets/index-CitI5O2z.js"></script>
-</head>
-<body data-theme="classic-dark">
-  <div id="root"></div>
 
-
-
+  <script type="module" src="/index.tsx"></script>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/firebase-messaging-sw.js').then(function(registration) {
-          console.log('Service Worker registration successful with scope: ', registration.scope);
-        }, function(err) {
-          console.log('Service Worker registration failed: ', err);
-        });
+        fetch('/firebase-messaging-sw.js', { cache: 'no-store' })
+          .then(function(response) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!response.ok || !contentType.includes('javascript')) {
+              return null;
+            }
+            return navigator.serviceWorker.register('/firebase-messaging-sw.js');
+          })
+          .then(function(registration) {
+            if (registration) {
+              console.log('Service Worker registration successful with scope: ', registration.scope);
+            }
+          })
+          .catch(function() {
+            // Avoid noisy console errors if the service worker can't be registered.
+          });
       });
     }
   </script>
