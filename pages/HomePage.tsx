@@ -33,12 +33,11 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ items }) => {
     if (!currentItem) return null;
 
     return (
-        <section className="relative mb-8 px-3 pt-5 sm:px-5 sm:pt-7" aria-label="Featured movies">
-            <div className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-56 max-w-5xl bg-[radial-gradient(ellipse_at_top,rgba(229,9,20,.17),transparent_68%)]" />
+        <section className="relative mb-6 px-3 pt-3 sm:px-5 sm:pt-5" aria-label="Featured movies">
             <div className="relative mx-auto max-w-6xl">
-                <div className="mb-3 flex items-center justify-between px-1">
-                    <h1 className="text-[22px] font-extrabold tracking-tight text-white sm:text-3xl">Featured movies</h1>
-                    <span className="rounded-full border border-white/10 bg-white/[0.05] px-3.5 py-2 text-sm font-bold tabular-nums text-white/60 sm:text-base">
+                <div className="mb-2 flex items-center justify-between px-1">
+                    <h2 className="text-[19px] font-extrabold tracking-tight text-white sm:text-2xl">Featured movies</h2>
+                    <span className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1 text-xs font-bold tabular-nums text-white/60 sm:text-sm">
                         <span className="text-white">{String(currentIndex + 1).padStart(2, '0')}</span> / {String(safeItems.length).padStart(2, '0')}
                     </span>
                 </div>
@@ -46,7 +45,7 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ items }) => {
                 <div className="group relative">
                     <Link
                         to={`/detail/${currentItem.id}`}
-                        className="relative block aspect-[1.42/1] overflow-hidden rounded-[26px] border border-white/20 bg-[#111] shadow-[0_20px_60px_rgba(0,0,0,.65)] sm:aspect-[16/8] sm:rounded-[30px]"
+                        className="relative block aspect-[1.5/1] overflow-hidden rounded-[20px] border border-white/10 bg-[#111] shadow-lg sm:aspect-[16/8] sm:rounded-[24px]"
                         aria-label={`View ${currentItem.title}`}
                     >
                         <img
@@ -55,36 +54,31 @@ const HeroSlider: React.FC<HeroSliderProps> = ({ items }) => {
                             alt={`${currentItem.title} featured artwork`}
                             className="absolute inset-0 h-full w-full object-cover animate-[heroFade_.55s_ease-out]"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/5" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-8">
-                            <div className="mb-2 flex flex-wrap items-center gap-2 text-[11px] font-extrabold uppercase tracking-[.13em] text-white/80 sm:text-sm">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+                        <div className="absolute inset-x-0 bottom-0 z-10 p-4 sm:p-7">
+                            <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[10px] font-extrabold uppercase tracking-wider text-white/80 sm:text-xs">
                                 {currentItem.year && <span>{currentItem.year}</span>}
                                 {currentItem.language && <><span className="text-[#e50914]">●</span><span>{currentItem.language}</span></>}
                                 {currentItem.rating > 0 && <><span className="text-[#e50914]">●</span><span className="text-amber-400">★</span><span>{currentItem.rating}</span></>}
                             </div>
-                            <h2 className="line-clamp-2 max-w-3xl text-[25px] font-black leading-[1.12] text-white drop-shadow-lg sm:text-4xl md:text-5xl">{currentItem.title}</h2>
-                            <span className="mt-4 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-base font-extrabold text-[#151515] shadow-xl transition-transform group-hover:scale-[1.03] sm:px-8 sm:py-4 sm:text-lg">
+                            <h3 className="line-clamp-2 max-w-2xl text-[18px] font-black leading-[1.2] text-white drop-shadow-md sm:text-3xl">{currentItem.title}</h3>
+                            <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-xs font-extrabold text-[#151515] shadow-md transition-transform group-hover:scale-[1.02] sm:px-6 sm:py-2.5 sm:text-sm">
                                 <i className="fas fa-play text-[#e50914]" aria-hidden="true" /> Watch now
                             </span>
                         </div>
                     </Link>
                     {safeItems.length > 1 && <>
-                        <button type="button" onClick={previousSlide} aria-label="Previous featured movie" className="absolute left-3 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/55 text-xl text-white backdrop-blur-md transition hover:bg-black/80 sm:h-16 sm:w-16 sm:text-2xl">
+                        <button type="button" onClick={previousSlide} aria-label="Previous featured movie" className="absolute left-2.5 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/50 text-sm text-white backdrop-blur-md transition hover:bg-black/80 sm:h-12 sm:w-12 sm:text-lg">
                             <i className="fas fa-chevron-left" aria-hidden="true" />
                         </button>
-                        <button type="button" onClick={nextSlide} aria-label="Next featured movie" className="absolute right-3 top-1/2 z-20 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/55 text-xl text-white backdrop-blur-md transition hover:bg-black/80 sm:h-16 sm:w-16 sm:text-2xl">
+                        <button type="button" onClick={nextSlide} aria-label="Next featured movie" className="absolute right-2.5 top-1/2 z-20 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/50 text-sm text-white backdrop-blur-md transition hover:bg-black/80 sm:h-12 sm:w-12 sm:text-lg">
                             <i className="fas fa-chevron-right" aria-hidden="true" />
                         </button>
                     </>}
                 </div>
-                <div className="mt-4 flex justify-center gap-2" role="tablist" aria-label="Featured movie slides">
-                    {safeItems.map((item, index) => (
-                        <button key={item.id} type="button" role="tab" aria-selected={currentIndex === index} aria-label={`Show slide ${index + 1}`} onClick={() => setCurrentIndex(index)} className={`h-1.5 rounded-full transition-all ${currentIndex === index ? 'w-16 bg-[#e50914]' : 'w-5 bg-white/25 hover:bg-white/50'}`} />
-                    ))}
-                </div>
             </div>
-            <style>{`@keyframes heroFade_ { from { opacity:.5; transform:scale(1.02) } to { opacity:1; transform:scale(1) } } @media (prefers-reduced-motion: reduce) { * { scroll-behavior:auto !important; } }`}</style>
+            <style>{`@keyframes heroFade_ { from { opacity:.5; transform:scale(1.02) } to { opacity:1; transform:scale(1) } }`}</style>
         </section>
     );
 };
@@ -118,6 +112,7 @@ const HomePage: React.FC = () => {
         () => [...content].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)),
         [content]
     );
+    
     const featuredItems = useMemo(() => {
         const selected = content.filter(item => item.isFeatured === true);
         const rest = latestItems.filter(item => item.isFeatured !== true);
@@ -125,7 +120,7 @@ const HomePage: React.FC = () => {
     }, [content, latestItems]);
 
     return (
-        <div className="min-h-[calc(100vh-4rem)] overflow-hidden bg-black text-white">
+        <div className="min-h-[calc(100vh-4rem)] overflow-hidden bg-black text-white pb-24">
             {loading ? (
                 <div className="flex min-h-[65vh] items-center justify-center">
                     <i className="fas fa-spinner fa-spin text-3xl text-[#e50914]" aria-label="Loading movies" />
@@ -133,23 +128,35 @@ const HomePage: React.FC = () => {
             ) : latestItems.length ? (
                 <>
                     <HeroSlider items={featuredItems} />
-                    <main className="mx-auto max-w-6xl px-3 pb-32 sm:px-5">
-                        <div className="mb-4 flex items-end justify-between px-1">
+                    <main className="mx-auto max-w-6xl px-3 sm:px-5">
+                        <div className="mb-3 flex items-end justify-between px-1">
                             <div>
-                                <p className="mb-1 text-[10px] font-bold uppercase tracking-[.24em] text-[#e50914]">Fresh from the screen</p>
-                                <h2 className="text-xl font-extrabold tracking-tight sm:text-2xl">Latest movies & series</h2>
+                                <h2 className="text-lg font-extrabold tracking-tight sm:text-xl">Latest movies & series</h2>
                             </div>
-                            <Link to="/movies" className="pb-1 text-sm font-bold text-white/60 transition hover:text-white">See all <i className="fas fa-arrow-right ml-1 text-xs" /></Link>
+                            <Link to="/movies" className="text-xs font-bold text-white/60 transition hover:text-white">See all <i className="fas fa-arrow-right ml-0.5 text-[10px]" /></Link>
                         </div>
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 lg:grid-cols-4">
                             {latestItems.map(item => (
-                                <Link key={item.id} to={`/detail/${item.id}`} className="group relative isolate aspect-[.52/1] overflow-hidden rounded-[22px] bg-[#141414] shadow-[0_12px_30px_rgba(0,0,0,.5)] ring-1 ring-white/[.04] sm:aspect-[.68/1] sm:rounded-[26px]">
-                                    <img src={item.poster || item.backdrop || ''} alt={`${item.title} poster`} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.045]" />
-                                    <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/95" />
-                                    {item.language && <span className="absolute right-2 top-2 max-w-[80%] truncate rounded-full border border-white/15 bg-black/55 px-2.5 py-1 text-[9px] font-bold text-white backdrop-blur-md sm:text-[10px]">{item.language}</span>}
-                                    <div className="absolute inset-x-0 bottom-0 px-2.5 pb-4 pt-12 text-center sm:px-4 sm:pb-5">
-                                        {formatDate(item.createdAt) && <div className="mb-2 flex items-center justify-center gap-2 text-[11px] font-medium text-white/85 sm:text-sm"><i className="far fa-calendar-alt" aria-hidden="true" /><span>{formatDate(item.createdAt)}</span></div>}
-                                        <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-white sm:text-lg">{item.title}{item.year ? ` ${item.year}` : ''}</h3>
+                                <Link key={item.id} to={`/detail/${item.id}`} className="group relative isolate aspect-[0.65/1] overflow-hidden rounded-[18px] bg-[#141414] shadow-md ring-1 ring-white/[.06] sm:rounded-[22px]">
+                                    <img src={item.poster || item.backdrop || ''} alt={`${item.title} poster`} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/90" />
+                                    
+                                    {item.language && (
+                                        <span className="absolute right-2 top-2 max-w-[75%] truncate rounded-full border border-white/15 bg-black/60 px-2 py-0.5 text-[9px] font-bold text-white backdrop-blur-md">
+                                            {item.language}
+                                        </span>
+                                    )}
+
+                                    <div className="absolute inset-x-0 bottom-0 p-3 text-center sm:p-4">
+                                        {formatDate(item.createdAt) && (
+                                            <div className="mb-1 flex items-center justify-center gap-1.5 text-[10px] font-medium text-white/70 sm:text-xs">
+                                                <i className="far fa-calendar-alt text-[10px]" aria-hidden="true" />
+                                                <span>{formatDate(item.createdAt)}</span>
+                                            </div>
+                                        )}
+                                        <h3 className="line-clamp-2 text-xs font-bold leading-snug text-white sm:text-sm">
+                                            {item.title}{item.year ? ` ${item.year}` : ''}
+                                        </h3>
                                     </div>
                                 </Link>
                             ))}
