@@ -1,138 +1,73 @@
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Content } from '../types';
 import { getAllContent } from '../services/firebaseService';
-import CategorySlider from '../components/CategorySlider';
-import HeroSlider from '../components/HeroSlider';
 
-// Helper to reliably parse date for sorting (handles number timestamp and ISO string)
 const parseDate = (date: string | number | undefined): number => {
     if (!date) return 0;
     if (typeof date === 'number') return date;
     const parsed = Date.parse(date);
-    return isNaN(parsed) ? 0 : parsed;
+    return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+const formatDate = (value: string | number | undefined): string => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
 const HomePage: React.FC = () => {
     const [content, setContent] = useState<Content[]>([]);
-    const [dataLoaded, setDataLoaded] = useState(false);
-    const [minDelayPassed, setMinDelayPassed] = useState(false);
-    useEffect(() => {
-        // Load all content so categories and movies are available together.
-        const unsubscribeContent = getAllContent(fetchedContent => {
-            setContent(fetchedContent);
-            setDataLoaded(true);
-        });
-        
-        return () => {
-            unsubscribeContent();
-        };
-    }, []);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const timer = setTimeout(() => setMinDelayPassed(true), 1000);
-        return () => clearTimeout(timer);
+        const unsubscribe = getAllContent(items => {
+            setContent(Array.isArray(items) ? items : []);
+            setLoading(false);
+        });
+        return () => unsubscribe();
     }, []);
 
-    const { categorizedContent, heroItems } = useMemo(() => {
-        const categories: { [key: string]: Content[] } = {};
-        
-        // Group content by category with normalization (trimming extra spaces and case-insensitive check)
-        content.forEach(item => {
-            let cat = (item.category || 'Others').trim();
-            // Case normalization to prevent split rows (e.g. 'Bhojpuri' vs 'bhojpuri')
-            const catLower = cat.toLowerCase();
-            if (catLower === 'bhojpuri') cat = 'Bhojpuri';
-            if (catLower === 'bollywood') cat = 'Bollywood';
-            if (catLower === 'hollywood') cat = 'Hollywood';
-            if (catLower === 'south indian') cat = 'South Indian';
-
-            if (!categories[cat]) {
-                categories[cat] = [];
-            }
-            categories[cat].push(item);
-        });
-        
-        // Sort each category row by 'createdAt' descending (STRICT NEWEST FIRST)
-        Object.keys(categories).forEach(key => {
-            categories[key].sort((a, b) => {
-                const timeA = parseDate(a.createdAt);
-                const timeB = parseDate(b.createdAt);
-                if (timeA !== timeB) return timeB - timeA;
-                return b.id.localeCompare(a.id);
-            });
-            // Show up to 15 items per category on home page
-            categories[key] = categories[key].slice(0, 15);
-        });
-        
-        // Hero Slider Logic:
-        // 1. Prioritize items marked as 'isFeatured' manually by Admin.
-        const featuredItems = content.filter(c => c.isFeatured === true);
-        featuredItems.sort((a, b) => parseDate(b.updatedAt) - parseDate(a.updatedAt));
-
-        // 2. Combine with latest uploads (sorted by createdAt)
-        const remainingItems = content.filter(c => !c.isFeatured);
-        remainingItems.sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt));
-
-        // Combine and slice top 5
-        const heroItems = [...featuredItems, ...remainingItems].slice(0, 5);
-
-        return { categorizedContent: categories, heroItems };
-    }, [content]);
-
-    const loading = !dataLoaded || !minDelayPassed;
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <i className="fas fa-spinner fa-spin text-4xl text-[var(--primary-color)]"></i>
-            </div>
-        );
-    }
-    
-    // Custom Sort Order - "Others" is strictly last
-    const categoryOrder = [
-        'Upcoming',
-        'South Indian', 
-        'Bollywood', 
-        'Hollywood', 
-        'Web Series', 
-        'Punjabi', 
-        'Bhojpuri', 
-        '18+', 
-        'Others'
-    ];
-    
-    const sortedCategories = Object.keys(categorizedContent).sort((a, b) => {
-        const indexA = categoryOrder.indexOf(a);
-        const indexB = categoryOrder.indexOf(b);
-
-        // If both are in the priority list, sort by defined order
-        if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-
-        // "Others" should always be last regardless
-        if (a === 'Others') return 1;
-        if (b === 'Others') return -1;
-
-        // If a is in list but b isn't, a comes first
-        if (indexA !== -1) return -1;
-        if (indexB !== -1) return 1;
-
-        // If neither are in list, sort alphabetically
-        return a.localeCompare(b);
-    });
+    const latestItems = useMemo(() => [...content].sort((a, b) => parseDate(b.createdAt) - parseDate(a.createdAt)), [content]);
 
     return (
-        <div className="space-y-4">
-            {heroItems && heroItems.length > 0 && <HeroSlider items={heroItems} />}
-            {sortedCategories.map(category => (
-                <CategorySlider 
-                    key={category}
-                    title={category}
-                    items={categorizedContent[category]}
-                    categoryLink={category}
-                />
-            ))}
+        <div className="min-h-[calc(100vh-4rem)] bg-black text-white">
+            <main className="mx-auto max-w-[1200px] px-3 pb-32 pt-3 sm:px-5 sm:pt-5">
+                {loading ? (
+                    <div className="flex min-h-[50vh] items-center justify-center">
+                        <i className="fas fa-spinner fa-spin text-3xl text-[#f20d20]" aria-label="Loading movies"></i>
+                    </div>
+                ) : latestItems.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-3 sm:gap-5">
+                        {latestItems.map(item => (
+                            <Link key={item.id} to={`/detail/${item.id}`} className="group relative isolate aspect-[2/3] overflow-hidden rounded-[22px] bg-[#141414] shadow-[0_12px_30px_rgba(0,0,0,.42)] ring-1 ring-white/[0.06]">
+                                <img
+                                    src={item.poster || item.backdrop || ''}
+                                    alt={`${item.title} poster`}
+                                    loading="lazy"
+                                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/95" />
+                                {item.language && <span className="absolute right-2 top-2 max-w-[75%] truncate rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">{item.language}</span>}
+                                <div className="absolute inset-x-0 bottom-0 px-2.5 pb-3 pt-12 text-center sm:px-4 sm:pb-5">
+                                    <div className="mb-1.5 flex items-center justify-center gap-2 text-[11px] font-medium text-white/90 sm:text-sm">
+                                        <i className="far fa-calendar-alt" aria-hidden="true"></i>
+                                        <span>{formatDate(item.createdAt)}</span>
+                                    </div>
+                                    <h2 className="line-clamp-2 text-[15px] font-bold leading-snug text-white sm:text-lg">{item.title}</h2>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex min-h-[50vh] flex-col items-center justify-center px-6 text-center">
+                        <i className="fas fa-film mb-4 text-4xl text-white/30"></i>
+                        <h1 className="text-xl font-bold">No movies yet</h1>
+                        <p className="mt-2 text-sm text-white/55">New movies and series will appear here when available.</p>
+                    </div>
+                )}
+            </main>
         </div>
     );
 };

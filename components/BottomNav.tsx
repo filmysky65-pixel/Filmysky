@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
@@ -10,37 +9,17 @@ const navItems = [
     { to: '/profile', icon: 'fas fa-user', label: 'Profile' },
 ];
 
-const BottomNav: React.FC = () => {
-    return (
-        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[94%] max-w-lg h-16 bg-[var(--card-bg)]/80 backdrop-blur-lg border border-[var(--border-color)] rounded-full shadow-2xl flex justify-around items-center z-50 md:hidden px-2">
-            {navItems.map((item) => (
-                <NavLink
-                    key={item.to}
-                    to={item.to}
-                    className={({ isActive }) => 
-                        `flex flex-col items-center justify-center transition-all duration-300 relative ${
-                            isActive ? 'text-[var(--primary-color)]' : 'text-gray-400'
-                        }`
-                    }
-                >
-                    {({ isActive }) => (
-                        <>
-                            <div className={`flex items-center justify-center w-12 h-8 rounded-full transition-all duration-300 ${
-                                isActive ? 'bg-[var(--primary-color)]/20' : ''
-                            }`}>
-                                <i className={`${item.icon} text-lg`}></i>
-                            </div>
-                            <span className={`text-[10px] mt-0.5 font-semibold transition-all duration-300 ${
-                                isActive ? 'opacity-100' : 'opacity-70'
-                            }`}>
-                                {item.label}
-                            </span>
-                        </>
-                    )}
+const BottomNav: React.FC = () => (
+    <nav aria-label="Bottom navigation" className="fixed bottom-4 left-1/2 z-50 w-[94%] max-w-[560px] -translate-x-1/2 rounded-full border border-[#d9c39d]/70 bg-[linear-gradient(110deg,rgba(191,157,112,.88),rgba(83,65,57,.92))] px-2 py-2 shadow-[0_8px_30px_rgba(0,0,0,.55)] backdrop-blur-xl md:hidden">
+        <div className="grid grid-cols-5 items-center">
+            {navItems.map(item => (
+                <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => `flex min-w-0 flex-col items-center justify-center gap-1 py-1.5 transition-colors ${isActive ? 'text-[#f20d20]' : 'text-[#c2c3cf]'}`}>
+                    <i className={`${item.icon} text-[21px]`} aria-hidden="true"></i>
+                    <span className="text-[11px] font-semibold leading-tight">{item.label}</span>
                 </NavLink>
             ))}
-        </nav>
-    );
-};
+        </div>
+    </nav>
+);
 
 export default BottomNav;
